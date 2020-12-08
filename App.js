@@ -12,9 +12,10 @@ export default function App() {
   useEffect(() => {
     (async () => {
       const status = await Location.requestPermissionsAsync();
-      Location.watchPositionAsync({}, (a) => {
+      Location.watchPositionAsync({ accuracy: 6 }, (a) => {
         console.log(a);
         if (lastPosition) {
+          console.log("helloooooooo!");
           console.log(
             getPreciseDistance(
               {
