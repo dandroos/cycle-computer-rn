@@ -85,22 +85,22 @@ const Dashboard = ({
               if (!inMotion) {
                 dispatch(setInMotion(true));
               }
-            }
-            const distanceTraveled = convertDistance(
-              getPreciseDistance(
-                {
-                  latitude: lastPositionRef.current.coords.latitude,
-                  longitude: lastPositionRef.current.coords.longitude,
-                },
-                {
-                  latitude: data.coords.latitude,
-                  longitude: data.coords.longitude,
-                }
-              ),
-              "km"
-            );
+              const distanceTraveled = convertDistance(
+                getPreciseDistance(
+                  {
+                    latitude: lastPositionRef.current.coords.latitude,
+                    longitude: lastPositionRef.current.coords.longitude,
+                  },
+                  {
+                    latitude: data.coords.latitude,
+                    longitude: data.coords.longitude,
+                  }
+                ),
+                "km"
+              );
 
-            dispatch(setDistance(distanceTraveled + distanceRef.current));
+              dispatch(setDistance(distanceTraveled + distanceRef.current));
+            }
 
             dispatch(
               setAverageSpeed((distanceRef.current / timeRef.current) * 3600)
