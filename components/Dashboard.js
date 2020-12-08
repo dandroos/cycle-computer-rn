@@ -26,6 +26,7 @@ const Dashboard = ({
 }) => {
   const lastPositionRef = useRef(lastPosition);
   const distanceRef = useRef(distance);
+  const currentSpeedRef = useRef(currentSpeed);
 
   const { time, pause, start, reset } = useTimer();
   useEffect(() => {
@@ -35,9 +36,13 @@ const Dashboard = ({
   useEffect(() => {
     distanceRef.current = distance;
   }, [distance]);
+
+  useEffect(() => {
+    currentSpeedRef.current = currentSpeed;
+  }, [currentSpeed]);
+
   useEffect(() => {
     (async () => {
-      start();
       const { status } = await Location.requestPermissionsAsync();
       if (status !== "granted") {
         // handle error
@@ -46,7 +51,6 @@ const Dashboard = ({
       Location.watchPositionAsync(
         { accuracy: 6, timeInterval: 500, distanceInterval: 0 },
         (data) => {
-          console.log(lastPositionRef);
           if (lastPositionRef.current) {
             dispatch(
               setCurrentSpeed(
@@ -67,7 +71,8 @@ const Dashboard = ({
                 ).toFixed(1)
               )
             );
-            if (currentSpeed < 1) {
+            console.log(currentSpeedRef.current);
+            if (currentSpeedRef.current < 1) {
               dispatch(setInMotion(false)); // pause clock
             } else {
               if (!inMotion) {
@@ -96,6 +101,14 @@ const Dashboard = ({
     })();
   }, []);
 
+  useEffect(() => {
+    if (inMotion) {
+      start();
+    } else {
+      pause();
+    }
+  }, [inMotion]);
+
   return (
     <View
       style={{
@@ -109,7 +122,9 @@ const Dashboard = ({
         <Text>km</Text>
       </View>
       <View style={{ alignItems: "center" }}>
-        <Text style={{ fontSize: 84 }}>{currentSpeed}</Text>
+        <Text style={{ fontSize: 84 }}>
+          {parseInt(currentSpeed).toFixed(1)}
+        </Text>
         <Text>km/h</Text>
       </View>
       <View style={{ alignItems: "center" }}>

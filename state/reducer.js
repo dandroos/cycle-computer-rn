@@ -9,15 +9,13 @@ import {
 const initialState = {
   distance: 0,
   averageSpeed: 0,
-  currentSpeed: 0,
+  currentSpeed: 0.0,
   lastPosition: null,
   inMotion: false,
 };
 
 export default (state = initialState, { type, payload }) => {
   const newState = Object.assign({}, state);
-  console.log(type);
-  console.log(payload);
 
   switch (type) {
     case SET_IN_MOTION:
