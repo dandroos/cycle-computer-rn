@@ -3,16 +3,29 @@ import { connect } from "react-redux";
 import { View } from "react-native";
 import { Text, Headline } from "react-native-paper";
 import * as Location from "expo-location";
-import { getDistance, getSpeed, convertSpeed } from "geolib";
-import { setCurrentSpeed, setLastPosition } from "../state/actions";
+import {
+  getPreciseDistance,
+  getSpeed,
+  convertSpeed,
+  convertDistance,
+} from "geolib";
+import {
+  setCurrentSpeed,
+  setLastPosition,
+  setDistance,
+} from "../state/actions";
 
-const Dashboard = ({ dispatch, lastPosition, currentSpeed }) => {
+const Dashboard = ({ dispatch, lastPosition, currentSpeed, distance }) => {
   const lastPositionRef = useRef(lastPosition);
+  const distanceRef = useRef(distance);
 
   useEffect(() => {
     lastPositionRef.current = lastPosition;
   }, [lastPosition]);
 
+  useEffect(() => {
+    distanceRef.current = distance;
+  }, [distance]);
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestPermissionsAsync();
@@ -44,6 +57,21 @@ const Dashboard = ({ dispatch, lastPosition, currentSpeed }) => {
                 ).toFixed(1)
               )
             );
+            const distanceTraveled = convertDistance(
+              getPreciseDistance(
+                {
+                  latitude: lastPositionRef.current.coords.latitude,
+                  longitude: lastPositionRef.current.coords.longitude,
+                },
+                {
+                  latitude: data.coords.latitude,
+                  longitude: data.coords.longitude,
+                }
+              ),
+              "km"
+            );
+
+            dispatch(setDistance(distanceTraveled + distanceRef.current));
           }
           dispatch(setLastPosition(data));
         }
@@ -60,7 +88,7 @@ const Dashboard = ({ dispatch, lastPosition, currentSpeed }) => {
       }}
     >
       <View style={{ alignItems: "center" }}>
-        <Text style={{ fontSize: 54 }}>3.6</Text>
+        <Text style={{ fontSize: 54 }}>{distance.toFixed(2)}</Text>
         <Text>km</Text>
       </View>
       <View style={{ alignItems: "center" }}>
@@ -77,6 +105,7 @@ const Dashboard = ({ dispatch, lastPosition, currentSpeed }) => {
 const mapStateToProps = (state) => ({
   lastPosition: state.lastPosition,
   currentSpeed: state.currentSpeed,
+  distance: state.distance,
 });
 
 export default connect(mapStateToProps)(Dashboard);
