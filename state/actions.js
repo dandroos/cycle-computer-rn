@@ -3,7 +3,13 @@ import {
   SET_AVERAGE_SPEED,
   SET_CURRENT_SPEED,
   SET_LAST_POSITION,
+  SET_IN_MOTION,
 } from "./types";
+
+export const setInMotion = (payload) => ({
+  type: SET_IN_MOTION,
+  payload,
+});
 
 export const setDistance = (payload) => ({
   type: SET_DISTANCE,

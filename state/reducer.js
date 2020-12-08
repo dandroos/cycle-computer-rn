@@ -3,6 +3,7 @@ import {
   SET_AVERAGE_SPEED,
   SET_CURRENT_SPEED,
   SET_LAST_POSITION,
+  SET_IN_MOTION,
 } from "./types";
 
 const initialState = {
@@ -10,6 +11,7 @@ const initialState = {
   averageSpeed: 0,
   currentSpeed: 0,
   lastPosition: null,
+  inMotion: false,
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -18,6 +20,9 @@ export default (state = initialState, { type, payload }) => {
   console.log(payload);
 
   switch (type) {
+    case SET_IN_MOTION:
+      newState.inMotion = payload;
+      break;
     case SET_LAST_POSITION:
       newState.lastPosition = payload;
       break;

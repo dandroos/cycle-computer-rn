@@ -13,12 +13,21 @@ import {
   setCurrentSpeed,
   setLastPosition,
   setDistance,
+  setInMotion,
 } from "../state/actions";
+import { useTimer } from "use-timer";
 
-const Dashboard = ({ dispatch, lastPosition, currentSpeed, distance }) => {
+const Dashboard = ({
+  dispatch,
+  lastPosition,
+  currentSpeed,
+  distance,
+  inMotion,
+}) => {
   const lastPositionRef = useRef(lastPosition);
   const distanceRef = useRef(distance);
 
+  const { time, pause, start, reset } = useTimer();
   useEffect(() => {
     lastPositionRef.current = lastPosition;
   }, [lastPosition]);
@@ -28,6 +37,7 @@ const Dashboard = ({ dispatch, lastPosition, currentSpeed, distance }) => {
   }, [distance]);
   useEffect(() => {
     (async () => {
+      start();
       const { status } = await Location.requestPermissionsAsync();
       if (status !== "granted") {
         // handle error
@@ -57,6 +67,13 @@ const Dashboard = ({ dispatch, lastPosition, currentSpeed, distance }) => {
                 ).toFixed(1)
               )
             );
+            if (currentSpeed < 1) {
+              dispatch(setInMotion(false)); // pause clock
+            } else {
+              if (!inMotion) {
+                dispatch(setInMotion(true));
+              }
+            }
             const distanceTraveled = convertDistance(
               getPreciseDistance(
                 {
@@ -96,7 +113,9 @@ const Dashboard = ({ dispatch, lastPosition, currentSpeed, distance }) => {
         <Text>km/h</Text>
       </View>
       <View style={{ alignItems: "center" }}>
-        <Text style={{ fontSize: 54 }}>12.3</Text>
+        <Text style={{ fontSize: 54 }}>
+          {new Date(time * 1000).toISOString().substr(11, 8)}
+        </Text>
         <Text>km/h</Text>
       </View>
     </View>
@@ -106,6 +125,7 @@ const mapStateToProps = (state) => ({
   lastPosition: state.lastPosition,
   currentSpeed: state.currentSpeed,
   distance: state.distance,
+  inMotion: state.inMotion,
 });
 
 export default connect(mapStateToProps)(Dashboard);
