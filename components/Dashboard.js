@@ -1,8 +1,49 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { connect } from "react-redux";
 import { View } from "react-native";
 import { Text, Headline } from "react-native-paper";
+import * as Location from "expo-location";
+import { getDistance, getSpeed, convertSpeed } from "geolib";
+import { setCurrentSpeed, setLastPosition } from "../state/actions";
 
-const Dashboard = () => {
+const Dashboard = ({ dispatch, lastPosition, currentSpeed }) => {
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestPermissionsAsync();
+      if (status !== "granted") {
+        // handle error
+      }
+
+      Location.watchPositionAsync(
+        { accuracy: 6, timeInterval: 500, distanceInterval: 0 },
+        (data) => {
+          if (lastPosition) {
+            dispatch(
+              setCurrentSpeed(
+                convertSpeed(
+                  getSpeed(
+                    {
+                      latitude: lastPosition.coords.latitude,
+                      longitude: lastPosition.coords.longitude,
+                      time: lastPosition.timestamp,
+                    },
+                    {
+                      latitlatitude: data.coords.latitude,
+                      longitude: data.coords.longitude,
+                      time: data.timestamp,
+                    }
+                  ),
+                  "kmh"
+                ).toFixed(1)
+              )
+            );
+          }
+          dispatch(setLastPosition(data));
+        }
+      );
+    })();
+  }, []);
+
   return (
     <View
       style={{
@@ -16,7 +57,7 @@ const Dashboard = () => {
         <Text>km</Text>
       </View>
       <View style={{ alignItems: "center" }}>
-        <Text style={{ fontSize: 84 }}>20.3</Text>
+        <Text style={{ fontSize: 84 }}>{currentSpeed}</Text>
         <Text>km/h</Text>
       </View>
       <View style={{ alignItems: "center" }}>
@@ -26,5 +67,9 @@ const Dashboard = () => {
     </View>
   );
 };
+const mapStateToProps = (state) => ({
+  lastPosition: state.lastPosition,
+  currentSpeed: state.currentSpeed,
+});
 
-export default Dashboard;
+export default connect(mapStateToProps)(Dashboard);
