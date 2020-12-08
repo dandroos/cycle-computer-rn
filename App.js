@@ -4,13 +4,31 @@ import { View } from "react-native";
 import Navbar from "./components/Navbar";
 import Dashboard from "./components/Dashboard";
 import * as Location from "expo-location";
+import { getPreciseDistance } from "geolib";
 
 export default function App() {
+  const [lastPosition, setLastPosition] = useState(null);
+
   useEffect(() => {
     (async () => {
       const status = await Location.requestPermissionsAsync();
       Location.watchPositionAsync({}, (a) => {
         console.log(a);
+        if (lastPosition) {
+          console.log(
+            getPreciseDistance(
+              {
+                latitude: lastPosition.coords.latitude,
+                longitude: lastPosition.coords.longitude,
+              },
+              {
+                latitude: a.coords.latitude,
+                longitude: a.coords.longitude,
+              }
+            )
+          );
+        }
+        setLastPosition(a);
       });
     })();
   }, []);
