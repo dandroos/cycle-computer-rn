@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { connect } from "react-redux";
 import { View } from "react-native";
 import { Text, Headline } from "react-native-paper";
@@ -7,6 +7,12 @@ import { getDistance, getSpeed, convertSpeed } from "geolib";
 import { setCurrentSpeed, setLastPosition } from "../state/actions";
 
 const Dashboard = ({ dispatch, lastPosition, currentSpeed }) => {
+  const lastPositionRef = useRef(lastPosition);
+
+  useEffect(() => {
+    lastPositionRef.current = lastPosition;
+  }, [lastPosition]);
+
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestPermissionsAsync();
@@ -17,18 +23,19 @@ const Dashboard = ({ dispatch, lastPosition, currentSpeed }) => {
       Location.watchPositionAsync(
         { accuracy: 6, timeInterval: 500, distanceInterval: 0 },
         (data) => {
-          if (lastPosition) {
+          console.log(lastPositionRef);
+          if (lastPositionRef.current) {
             dispatch(
               setCurrentSpeed(
                 convertSpeed(
                   getSpeed(
                     {
-                      latitude: lastPosition.coords.latitude,
-                      longitude: lastPosition.coords.longitude,
-                      time: lastPosition.timestamp,
+                      latitude: lastPositionRef.current.coords.latitude,
+                      longitude: lastPositionRef.current.coords.longitude,
+                      time: lastPositionRef.current.timestamp,
                     },
                     {
-                      latitlatitude: data.coords.latitude,
+                      latitude: data.coords.latitude,
                       longitude: data.coords.longitude,
                       time: data.timestamp,
                     }

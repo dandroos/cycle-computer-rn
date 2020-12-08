@@ -9,15 +9,13 @@ import * as Location from "expo-location";
 import { getDistance, getSpeed, convertSpeed } from "geolib";
 
 export default function App() {
-  const [lastPosition, _setLastPosition] = useState(null);
-  const [speed, setSpeed] = useState(0);
-
-  const positionRef = useRef(lastPosition);
+  /*  const positionRef = useRef(lastPosition);
 
   const setLastPosition = (data) => {
     positionRef.current = data;
     _setLastPosition(data);
   };
+  
   useEffect(() => {
     (async () => {
       const status = await Location.requestPermissionsAsync();
@@ -60,13 +58,13 @@ export default function App() {
             const secondsSinceLastUpdate = res % 60;
 
             console.log((distance / secondsSinceLastUpdate) * 3.6);
-            */
           }
           setLastPosition(a);
         }
       );
     })();
   }, []);
+  */
   return (
     <Provider store={store}>
       <View style={{ flex: 1 }}>

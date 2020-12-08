@@ -14,6 +14,8 @@ const initialState = {
 
 export default (state = initialState, { type, payload }) => {
   const newState = Object.assign({}, state);
+  console.log(type);
+  console.log(payload);
 
   switch (type) {
     case SET_LAST_POSITION:
