@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { connect } from "react-redux";
 import { View } from "react-native";
-import { Text, Headline } from "react-native-paper";
+import { Text } from "react-native-paper";
 import * as Location from "expo-location";
 import {
   getPreciseDistance,
@@ -14,11 +14,13 @@ import {
   setLastPosition,
   setDistance,
   setInMotion,
+  setAverageSpeed,
 } from "../state/actions";
 import { useTimer } from "use-timer";
 
 const Dashboard = ({
   dispatch,
+  averageSpeed,
   lastPosition,
   currentSpeed,
   distance,
@@ -29,6 +31,12 @@ const Dashboard = ({
   const currentSpeedRef = useRef(currentSpeed);
 
   const { time, pause, start, reset } = useTimer();
+  const timeRef = useRef(time);
+
+  useEffect(() => {
+    timeRef.current = time;
+  }, [time]);
+
   useEffect(() => {
     lastPositionRef.current = lastPosition;
   }, [lastPosition]);
@@ -71,7 +79,6 @@ const Dashboard = ({
                 ).toFixed(1)
               )
             );
-            console.log(currentSpeedRef.current);
             if (currentSpeedRef.current < 1) {
               dispatch(setInMotion(false)); // pause clock
             } else {
@@ -94,6 +101,10 @@ const Dashboard = ({
             );
 
             dispatch(setDistance(distanceTraveled + distanceRef.current));
+
+            dispatch(
+              setAverageSpeed((distanceRef.current / timeRef.current) * 3600)
+            );
           }
           dispatch(setLastPosition(data));
         }
@@ -128,6 +139,10 @@ const Dashboard = ({
         <Text>km/h</Text>
       </View>
       <View style={{ alignItems: "center" }}>
+        <Text style={{ fontSize: 54 }}>{averageSpeed.toFixed(2)}</Text>
+        <Text>km/h</Text>
+      </View>
+      <View style={{ alignItems: "center" }}>
         <Text style={{ fontSize: 54 }}>
           {new Date(time * 1000).toISOString().substr(11, 8)}
         </Text>
@@ -141,6 +156,7 @@ const mapStateToProps = (state) => ({
   currentSpeed: state.currentSpeed,
   distance: state.distance,
   inMotion: state.inMotion,
+  averageSpeed: state.averageSpeed,
 });
 
 export default connect(mapStateToProps)(Dashboard);
