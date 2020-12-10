@@ -62,8 +62,12 @@ const Dashboard = ({
       }, 1000);
 
       Location.watchPositionAsync(
-        { accuracy: 6, timeInterval: 500, distanceInterval: 1 },
+        { accuracy: 5, timeInterval: 1000, distanceInterval: 5 },
         (data) => {
+          console.log("BOOYAHHHH!");
+          Location.getCurrentPositionAsync().then((res) => {
+            console.log(res);
+          });
           if (lastPositionRef.current) {
             dispatch(
               setCurrentSpeed(
@@ -107,10 +111,12 @@ const Dashboard = ({
 
               dispatch(setDistance(distanceTraveled + distanceRef.current));
             }
-
-            dispatch(
-              setAverageSpeed((distanceRef.current / timeRef.current) * 3600)
-            );
+            console.log(0 / 0);
+            if (typeof distanceRef.current / timeRef.current === "number") {
+              dispatch(
+                setAverageSpeed((distanceRef.current / timeRef.current) * 3600)
+              );
+            }
           }
           dispatch(setLastPosition(data));
         }
