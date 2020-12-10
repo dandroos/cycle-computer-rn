@@ -8,7 +8,7 @@ import {
 
 const initialState = {
   distance: 0,
-  averageSpeed: 0,
+  averageSpeed: 0.0,
   currentSpeed: 0.0,
   lastPosition: null,
   inMotion: false,

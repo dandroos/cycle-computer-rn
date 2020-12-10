@@ -1,7 +1,7 @@
-import React, { useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { connect } from "react-redux";
 import { View } from "react-native";
-import { Text } from "react-native-paper";
+import { Text, Headline } from "react-native-paper";
 import * as Location from "expo-location";
 import {
   getPreciseDistance,
@@ -17,6 +17,7 @@ import {
   setAverageSpeed,
 } from "../state/actions";
 import { useTimer } from "use-timer";
+import AdditionalData from "./AdditionalData";
 
 const Dashboard = ({
   dispatch,
@@ -56,8 +57,12 @@ const Dashboard = ({
         // handle error
       }
 
+      setInterval(() => {
+        setCurrentTime(new Date());
+      }, 1000);
+
       Location.watchPositionAsync(
-        { accuracy: 6, timeInterval: 500, distanceInterval: 0 },
+        { accuracy: 6, timeInterval: 500, distanceInterval: 1 },
         (data) => {
           if (lastPositionRef.current) {
             dispatch(
@@ -80,7 +85,7 @@ const Dashboard = ({
               )
             );
             if (currentSpeedRef.current < 1) {
-              dispatch(setInMotion(false)); // pause clock
+              dispatch(setInMotion(false));
             } else {
               if (!inMotion) {
                 dispatch(setInMotion(true));
@@ -94,7 +99,8 @@ const Dashboard = ({
                   {
                     latitude: data.coords.latitude,
                     longitude: data.coords.longitude,
-                  }
+                  },
+                  0.1
                 ),
                 "km"
               );
@@ -120,6 +126,8 @@ const Dashboard = ({
     }
   }, [inMotion]);
 
+  const [currentTime, setCurrentTime] = useState(new Date());
+
   return (
     <View
       style={{
@@ -128,9 +136,29 @@ const Dashboard = ({
         justifyContent: "space-around",
       }}
     >
-      <View style={{ alignItems: "center" }}>
-        <Text style={{ fontSize: 54 }}>{distance.toFixed(2)}</Text>
-        <Text>km</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-around",
+          alignItems: "center",
+        }}
+      >
+        <AdditionalData
+          slotNumber={1}
+          section={{
+            label: "Distance",
+            reading: distance.toFixed(2),
+            unit: "km",
+          }}
+        />
+        <AdditionalData
+          slotNumber={2}
+          section={{
+            label: "Average speed",
+            reading: parseInt(averageSpeed).toFixed(1),
+            unit: "km/h",
+          }}
+        />
       </View>
       <View style={{ alignItems: "center" }}>
         <Text style={{ fontSize: 84 }}>
@@ -138,15 +166,29 @@ const Dashboard = ({
         </Text>
         <Text>km/h</Text>
       </View>
-      <View style={{ alignItems: "center" }}>
-        <Text style={{ fontSize: 54 }}>{averageSpeed.toFixed(2)}</Text>
-        <Text>km/h</Text>
-      </View>
-      <View style={{ alignItems: "center" }}>
-        <Text style={{ fontSize: 54 }}>
-          {new Date(time * 1000).toISOString().substr(11, 8)}
-        </Text>
-        <Text>km/h</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-around",
+          alignItems: "center",
+        }}
+      >
+        <AdditionalData
+          slotNumber={1}
+          section={{
+            label: "Time in motion",
+            reading: new Date(time * 1000).toISOString().substr(11, 8),
+            unit: "",
+          }}
+        />
+        <AdditionalData
+          slotNumber={2}
+          section={{
+            label: "Time",
+            reading: currentTime.toISOString().substr(11, 8),
+            unit: "",
+          }}
+        />
       </View>
     </View>
   );
