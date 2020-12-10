@@ -62,63 +62,71 @@ const Dashboard = ({
       }, 1000);
 
       Location.watchPositionAsync(
-        { accuracy: 5, timeInterval: 1000, distanceInterval: 5 },
+        { accuracy: 6, timeInterval: 1000, distanceInterval: 0 },
         (data) => {
           console.log("BOOYAHHHH!");
           Location.getCurrentPositionAsync().then((res) => {
-            console.log(res);
-          });
-          if (lastPositionRef.current) {
-            dispatch(
-              setCurrentSpeed(
-                convertSpeed(
-                  getSpeed(
-                    {
-                      latitude: lastPositionRef.current.coords.latitude,
-                      longitude: lastPositionRef.current.coords.longitude,
-                      time: lastPositionRef.current.timestamp,
-                    },
-                    {
-                      latitude: data.coords.latitude,
-                      longitude: data.coords.longitude,
-                      time: data.timestamp,
-                    }
-                  ),
-                  "kmh"
-                ).toFixed(1)
-              )
-            );
-            if (currentSpeedRef.current < 1) {
-              dispatch(setInMotion(false));
-            } else {
-              if (!inMotion) {
-                dispatch(setInMotion(true));
-              }
-              const distanceTraveled = convertDistance(
-                getPreciseDistance(
-                  {
-                    latitude: lastPositionRef.current.coords.latitude,
-                    longitude: lastPositionRef.current.coords.longitude,
-                  },
-                  {
-                    latitude: data.coords.latitude,
-                    longitude: data.coords.longitude,
-                  },
-                  0.1
-                ),
-                "km"
-              );
+            if (res.coords.accuracy < 10) {
+              if (lastPositionRef.current) {
+                console.log("SSSSSSSP!");
+                dispatch(
+                  setCurrentSpeed(
+                    convertSpeed(
+                      getSpeed(
+                        {
+                          latitude: lastPositionRef.current.coords.latitude,
+                          longitude: lastPositionRef.current.coords.longitude,
+                          time: lastPositionRef.current.timestamp,
+                        },
+                        {
+                          latitude: data.coords.latitude,
+                          longitude: data.coords.longitude,
+                          time: data.timestamp,
+                        }
+                      ),
+                      "kmh"
+                    ).toFixed(1)
+                  )
+                );
+                console.log(currentSpeedRef);
+                if (currentSpeedRef.current < 1) {
+                  console.log("it's less than 1 meter");
+                  dispatch(setInMotion(false));
+                } else {
+                  if (!inMotion) {
+                    console.log("We are moving!");
+                    dispatch(setInMotion(true));
+                  }
+                  const distanceTraveled = convertDistance(
+                    getPreciseDistance(
+                      {
+                        latitude: lastPositionRef.current.coords.latitude,
+                        longitude: lastPositionRef.current.coords.longitude,
+                      },
+                      {
+                        latitude: data.coords.latitude,
+                        longitude: data.coords.longitude,
+                      },
+                      0.1
+                    ),
+                    "km"
+                  );
+                  console.log(distanceTraveled);
 
-              dispatch(setDistance(distanceTraveled + distanceRef.current));
+                  dispatch(setDistance(distanceTraveled + distanceRef.current));
+                }
+                if (typeof distanceRef.current / timeRef.current === "number") {
+                  dispatch(
+                    setAverageSpeed(
+                      (distanceRef.current / timeRef.current) * 3600
+                    )
+                  );
+                }
+              }
+              dispatch(setLastPosition(data));
+              console.log("we are at the end");
             }
-            console.log(0 / 0);
-            if (typeof distanceRef.current / timeRef.current === "number") {
-              dispatch(
-                setAverageSpeed((distanceRef.current / timeRef.current) * 3600)
-              );
-            }
-          }
-          dispatch(setLastPosition(data));
+          });
         }
       );
     })();
