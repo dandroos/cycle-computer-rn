@@ -11,7 +11,7 @@ import {
 } from "./types";
 
 const initialState = {
-  distance: 0,
+  distance: 0.0,
   averageSpeed: 0.0,
   currentSpeed: 0.0,
   lastPosition: null,

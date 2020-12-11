@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { View, TouchableOpacity } from "react-native";
 import { Text } from "react-native-paper";
@@ -15,12 +15,12 @@ const AdditionalData = ({
   const dashboardData = {
     DISTANCE: {
       label: "Distance",
-      reading: distance.toFixed(),
+      reading: distance,
       unit: appUnit === "k" ? "km" : "mi",
     },
     AVERAGE_SPEED: {
       label: "Average speed",
-      reading: averageSpeed,
+      reading: averageSpeed.toFixed(1),
       unit: appUnit === "k" ? "km/h" : "mph",
     },
     TIME_IN_MOTION: {
@@ -30,28 +30,38 @@ const AdditionalData = ({
     },
     CLOCK: {
       label: "Clock",
-      reading: clock.toISOString().substr(11, 8),
+      reading: clock.toISOString().substr(11, 5),
       unit: "",
     },
   };
 
+  /*
   useEffect(() => {
-    dashboardData.DISTANCE.reading = distance.toFixed(2);
-    dashboardData.AVERAGE_SPEED.reading = averageSpeed.toFixed(1);
+    dashboardData.DISTANCE.reading = distance;
     dashboardData.TIME_IN_MOTION.reading = new Date(timeInMotion * 1000)
       .toISOString()
       .substr(11, 8);
-    dashboardData.CLOCK.reading = clock.toISOString().substr(11, 8);
+    dashboardData.CLOCK.reading = clock.toISOString().substr(11, 5);
+    console.log(distance);
   }, [distance, averageSpeed, clock, timeInMotion]);
 
-  const { label, reading, unit } = dashboardData[slots[`slot${slotNumber}`]];
+  useEffect(() => {
+    dashboardData.AVERAGE_SPEED.reading = averageSpeed.toFixed(1);
+  }, [averageSpeed]);
 
+  useEffect(()=>)
+  */
   return (
     <TouchableOpacity onLongPress={() => console.log("load a menu")}>
       <View style={{ alignItems: "center" }}>
-        <Text style={{ fontSize: 15 }}>{label}</Text>
-        <Text style={{ fontSize: 34 }}>{reading}</Text>
-        <Text>{unit}</Text>
+        <Text style={{ fontSize: 15 }}>
+          {}
+          {dashboardData[slots[`slot${slotNumber}`]].label}
+        </Text>
+        <Text style={{ fontSize: 34 }}>
+          {dashboardData[slots[`slot${slotNumber}`]].reading}
+        </Text>
+        <Text>{dashboardData[slots[`slot${slotNumber}`]].unit}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -59,7 +69,6 @@ const AdditionalData = ({
 
 const mapStateToProps = (state) => ({
   slots: state.slots,
-  distance: state.distance,
   averageSpeed: state.averageSpeed,
   clock: state.clock,
   timeInMotion: state.timeInMotion,

@@ -16,6 +16,7 @@ import {
   setInMotion,
   setAverageSpeed,
   setTimeInMotion,
+  setClock,
 } from "../state/actions";
 import { useTimer } from "use-timer";
 import AdditionalData from "./AdditionalData";
@@ -63,6 +64,7 @@ const Dashboard = ({
 
       setInterval(() => {
         setCurrentTime(new Date());
+        dispatch(setClock(new Date()));
       }, 1000);
 
       Location.watchPositionAsync(
