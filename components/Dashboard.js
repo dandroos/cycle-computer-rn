@@ -61,10 +61,11 @@ const Dashboard = ({
           {
             accuracy: Location.Accuracy.Highest,
             timeInterval: 1000,
+            distanceInterval: 0,
           },
           (data) => {
             dispatch(setClock(new Date()));
-            console.log(((data.coords.speed * 3600) / 1000).toFixed(1));
+            console.log(((data.coords.speed * 3600) / 1000).toFixed(1) < 1);
             if (lastPositionRef.current) {
               const _distance = getDistance(
                 {
