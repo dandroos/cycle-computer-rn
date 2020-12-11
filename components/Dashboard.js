@@ -57,9 +57,11 @@ const Dashboard = ({
         // handle error
       }
       Location.enableNetworkProviderAsync().then(() => {
-        Location.watchPositionAsync({ accuracy: 6, timeInterval: 100 }, () => {
-          dispatch(setClock(new Date()));
-          Location.getLastKnownPositionAsync().then((data) => {
+        Location.watchPositionAsync(
+          { accuracy: 6, timeInterval: 100 },
+          (data) => {
+            dispatch(setClock(new Date()));
+
             if (lastPositionRef.current) {
               const _distance = getDistance(
                 {
@@ -72,11 +74,12 @@ const Dashboard = ({
                 },
                 0.1
               );
-              console.log(_distance > 1 ? "Over a meter" : "zilch");
+              // console.log(_distance);
+              console.log(_distance > 0.1 ? "We are moving" : "We are stopped");
             }
             dispatch(setLastPosition(data));
-          });
-        });
+          }
+        );
       });
 
       /*
