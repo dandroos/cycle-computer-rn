@@ -5,7 +5,13 @@ import {
   SET_LAST_POSITION,
   SET_IN_MOTION,
   SET_UNIT,
+  SET_TIME_IN_MOTION,
 } from "./types";
+
+export const setTimeInMotion = (payload) => ({
+  type: SET_TIME_IN_MOTION,
+  payload,
+});
 
 export const setUnit = (payload) => ({
   type: SET_UNIT,

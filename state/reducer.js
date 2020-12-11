@@ -5,6 +5,7 @@ import {
   SET_LAST_POSITION,
   SET_IN_MOTION,
   SET_UNIT,
+  SET_TIME_IN_MOTION,
 } from "./types";
 
 const initialState = {
@@ -20,12 +21,16 @@ const initialState = {
     slot3: "timeInMotion",
     slot4: "clock",
   },
+  timeInMotion: "",
 };
 
 export default (state = initialState, { type, payload }) => {
   const newState = Object.assign({}, state);
 
   switch (type) {
+    case SET_TIME_IN_MOTION:
+      newState.timeInMotion = payload;
+      break;
     case SET_UNIT:
       newState.unit = payload;
       break;

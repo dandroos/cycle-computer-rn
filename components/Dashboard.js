@@ -15,6 +15,7 @@ import {
   setDistance,
   setInMotion,
   setAverageSpeed,
+  setTimeInMotion,
 } from "../state/actions";
 import { useTimer } from "use-timer";
 import AdditionalData from "./AdditionalData";
@@ -38,6 +39,7 @@ const Dashboard = ({
 
   useEffect(() => {
     timeRef.current = time;
+    dispatch(setTimeInMotion(time));
   }, [time]);
 
   useEffect(() => {
