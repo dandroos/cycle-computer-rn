@@ -154,22 +154,8 @@ const Dashboard = ({
           alignItems: "center",
         }}
       >
-        <AdditionalData
-          slotNumber={1}
-          section={{
-            label: "Distance",
-            reading: distance.toFixed(2),
-            unit: "km",
-          }}
-        />
-        <AdditionalData
-          slotNumber={2}
-          section={{
-            label: "Average speed",
-            reading: parseInt(averageSpeed).toFixed(1),
-            unit: "km/h",
-          }}
-        />
+        <AdditionalData slotNumber={1} />
+        <AdditionalData slotNumber={2} />
       </View>
       <CurrentSpeed />
       <View
@@ -179,22 +165,8 @@ const Dashboard = ({
           alignItems: "center",
         }}
       >
-        <AdditionalData
-          slotNumber={1}
-          section={{
-            label: "Time in motion",
-            reading: new Date(time * 1000).toISOString().substr(11, 8),
-            unit: "",
-          }}
-        />
-        <AdditionalData
-          slotNumber={2}
-          section={{
-            label: "Time",
-            reading: currentTime.toISOString().substr(11, 8),
-            unit: "",
-          }}
-        />
+        <AdditionalData slotNumber={3} />
+        <AdditionalData slotNumber={4} />
       </View>
     </View>
   );

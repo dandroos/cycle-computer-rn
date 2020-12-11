@@ -5,3 +5,5 @@ export const SET_CURRENT_SPEED = "SET_CURRENT_SPEED";
 export const SET_DISTANCE = "SET_DISTANCE";
 export const SET_AVERAGE_SPEED = "SET_AVERAGE_SPEED";
 export const SET_TIME_IN_MOTION = "SET_TIME_IN_MOTION";
+export const SET_CLOCK = "SET_CLOCK";
+export const SET_SLOTS = "SET_SLOTS";

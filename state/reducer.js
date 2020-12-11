@@ -6,6 +6,8 @@ import {
   SET_IN_MOTION,
   SET_UNIT,
   SET_TIME_IN_MOTION,
+  SET_CLOCK,
+  SET_SLOTS,
 } from "./types";
 
 const initialState = {
@@ -14,20 +16,27 @@ const initialState = {
   currentSpeed: 0.0,
   lastPosition: null,
   inMotion: false,
-  unit: "kmh",
+  unit: "k",
   slots: {
-    slot1: "distance",
-    slot2: "averageSpeed",
-    slot3: "timeInMotion",
-    slot4: "clock",
+    slot1: "DISTANCE",
+    slot2: "AVERAGE_SPEED",
+    slot3: "TIME_IN_MOTION",
+    slot4: "CLOCK",
   },
-  timeInMotion: "",
+  timeInMotion: new Date(),
+  clock: new Date(),
 };
 
 export default (state = initialState, { type, payload }) => {
   const newState = Object.assign({}, state);
 
   switch (type) {
+    case SET_SLOTS:
+      newState.slots = payload;
+      break;
+    case SET_CLOCK:
+      newState.clock = payload;
+      break;
     case SET_TIME_IN_MOTION:
       newState.timeInMotion = payload;
       break;

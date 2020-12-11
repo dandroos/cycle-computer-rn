@@ -6,7 +6,19 @@ import {
   SET_IN_MOTION,
   SET_UNIT,
   SET_TIME_IN_MOTION,
+  SET_CLOCK,
+  SET_SLOTS,
 } from "./types";
+
+export const setSlots = (payload) => ({
+  type: SET_SLOTS,
+  payload,
+});
+
+export const setClock = (payload) => ({
+  type: SET_CLOCK,
+  payload,
+});
 
 export const setTimeInMotion = (payload) => ({
   type: SET_TIME_IN_MOTION,

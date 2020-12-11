@@ -3,11 +3,19 @@ import { connect } from "react-redux";
 import { View, TouchableOpacity } from "react-native";
 import { Text } from "react-native-paper";
 
-const AdditionalData = ({ distance, slotNumber }) => {
+const AdditionalData = ({
+  slots,
+  distance,
+  averageSpeed,
+  clock,
+  timeInMotion,
+  slotNumber,
+  appUnit,
+}) => {
   const dashboardData = {
     DISTANCE: {
       label: "Distance",
-      reading: distance,
+      reading: distance.toFixed(),
       unit: appUnit === "k" ? "km" : "mi",
     },
     AVERAGE_SPEED: {
@@ -17,17 +25,26 @@ const AdditionalData = ({ distance, slotNumber }) => {
     },
     TIME_IN_MOTION: {
       label: "Time in motion",
-      reading: timeInMotion,
+      reading: new Date(timeInMotion * 1000).toISOString().substr(11, 8),
       unit: "",
     },
     CLOCK: {
       label: "Clock",
-      reading: clock,
+      reading: clock.toISOString().substr(11, 8),
       unit: "",
     },
   };
 
-  const { label, reading, unit } = dashboardData[type];
+  useEffect(() => {
+    dashboardData.DISTANCE.reading = distance.toFixed(2);
+    dashboardData.AVERAGE_SPEED.reading = averageSpeed.toFixed(1);
+    dashboardData.TIME_IN_MOTION.reading = new Date(timeInMotion * 1000)
+      .toISOString()
+      .substr(11, 8);
+    dashboardData.CLOCK.reading = clock.toISOString().substr(11, 8);
+  }, [distance, averageSpeed, clock, timeInMotion]);
+
+  const { label, reading, unit } = dashboardData[slots[`slot${slotNumber}`]];
 
   return (
     <TouchableOpacity onLongPress={() => console.log("load a menu")}>
@@ -46,6 +63,7 @@ const mapStateToProps = (state) => ({
   averageSpeed: state.averageSpeed,
   clock: state.clock,
   timeInMotion: state.timeInMotion,
+  appUnit: state.unit,
 });
 
 export default connect(mapStateToProps)(AdditionalData);
