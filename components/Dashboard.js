@@ -56,11 +56,30 @@ const Dashboard = ({
       if (status !== "granted") {
         // handle error
       }
+      Location.enableNetworkProviderAsync().then(() => {
+        Location.watchPositionAsync({ accuracy: 6, timeInterval: 100 }, () => {
+          dispatch(setClock(new Date()));
+          Location.getLastKnownPositionAsync().then((data) => {
+            if (lastPositionRef.current) {
+              const _distance = getDistance(
+                {
+                  latitude: lastPositionRef.current.coords.latitude,
+                  longitude: lastPositionRef.current.coords.longitude,
+                },
+                {
+                  latitude: data.coords.latitude,
+                  longitude: data.coords.longitude,
+                },
+                0.1
+              );
+              console.log(_distance > 1 ? "Over a meter" : "zilch");
+            }
+            dispatch(setLastPosition(data));
+          });
+        });
+      });
 
-      setInterval(() => {
-        dispatch(setClock(new Date()));
-      }, 1000);
-
+      /*
       Location.watchPositionAsync(
         { accuracy: 6, distanceInterval: 1 },
         (data) => {
@@ -129,11 +148,11 @@ const Dashboard = ({
               dispatch(
                 setAverageSpeed((distanceRef.current / timeRef.current) * 3600)
               );
-            }*/
+            }
           }
-          dispatch(setLastPosition(data));
+      dispatch(setLastPosition(data)); 
         }
-      );
+      );*/
     })();
   }, []);
 
