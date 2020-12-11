@@ -58,10 +58,14 @@ const Dashboard = ({
       }
       Location.enableNetworkProviderAsync().then(() => {
         Location.watchPositionAsync(
-          { accuracy: 6, timeInterval: 100 },
+          {
+            accuracy: Location.Accuracy.Highest,
+            timeInterval: 3000,
+            distanceInterval: 1,
+          },
           (data) => {
             dispatch(setClock(new Date()));
-
+            console.log(data.coords.speed);
             if (lastPositionRef.current) {
               const _distance = getDistance(
                 {
@@ -75,7 +79,7 @@ const Dashboard = ({
                 0.1
               );
               // console.log(_distance);
-              console.log(_distance > 0.1 ? "We are moving" : "We are stopped");
+              console.log(_distance > 0 ? "We are moving" : "We are stopped");
             }
             dispatch(setLastPosition(data));
           }
