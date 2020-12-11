@@ -3,12 +3,7 @@ import { connect } from "react-redux";
 import { View } from "react-native";
 import { Text, Headline } from "react-native-paper";
 import * as Location from "expo-location";
-import {
-  getPreciseDistance,
-  getSpeed,
-  convertSpeed,
-  convertDistance,
-} from "geolib";
+import { getDistance, getSpeed, convertSpeed, convertDistance } from "geolib";
 import {
   setCurrentSpeed,
   setLastPosition,
@@ -67,9 +62,27 @@ const Dashboard = ({
       }, 1000);
 
       Location.watchPositionAsync(
-        { accuracy: 6, timeInterval: 1000, distanceInterval: 2 },
+        { accuracy: 6, distanceInterval: 1 },
         (data) => {
+          console.log(`Acc: ${data.coords.accuracy}`);
+          if (data.coords.accuracy < 5) console.log(data.coords.speed * 3600);
           if (lastPositionRef.current) {
+            const _distance = getDistance(
+              {
+                latitude: lastPositionRef.current.coords.latitude,
+                longitude: lastPositionRef.current.coords.longitude,
+              },
+              {
+                latitude: data.coords.latitude,
+                longitude: data.coords.longitude,
+              },
+              0.5
+            );
+            console.log(_distance);
+
+            console.log(_distance > 0);
+
+            /*
             dispatch(
               setCurrentSpeed(
                 convertSpeed(
@@ -96,7 +109,7 @@ const Dashboard = ({
                 dispatch(setInMotion(true));
               }
               const distanceTraveled = convertDistance(
-                getPreciseDistance(
+                getDistance(
                   {
                     latitude: lastPositionRef.current.coords.latitude,
                     longitude: lastPositionRef.current.coords.longitude,
@@ -116,7 +129,7 @@ const Dashboard = ({
               dispatch(
                 setAverageSpeed((distanceRef.current / timeRef.current) * 3600)
               );
-            }
+            }*/
           }
           dispatch(setLastPosition(data));
         }
