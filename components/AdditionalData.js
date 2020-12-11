@@ -1,4 +1,5 @@
 import React from "react";
+import { connect } from "react-redux";
 import { View, TouchableOpacity } from "react-native";
 import { Text } from "react-native-paper";
 
@@ -15,4 +16,8 @@ const AdditionalData = ({ section, slotNumber }) => {
   );
 };
 
-export default AdditionalData;
+const mapStateToProps = (state) => ({
+  slots: state.slots,
+});
+
+export default connect(mapStateToProps)(AdditionalData);

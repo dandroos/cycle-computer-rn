@@ -4,6 +4,7 @@ import {
   SET_CURRENT_SPEED,
   SET_LAST_POSITION,
   SET_IN_MOTION,
+  SET_UNIT,
 } from "./types";
 
 const initialState = {
@@ -12,12 +13,22 @@ const initialState = {
   currentSpeed: 0.0,
   lastPosition: null,
   inMotion: false,
+  unit: "kmh",
+  slots: {
+    slot1: "distance",
+    slot2: "averageSpeed",
+    slot3: "timeInMotion",
+    slot4: "clock",
+  },
 };
 
 export default (state = initialState, { type, payload }) => {
   const newState = Object.assign({}, state);
 
   switch (type) {
+    case SET_UNIT:
+      newState.unit = payload;
+      break;
     case SET_IN_MOTION:
       newState.inMotion = payload;
       break;

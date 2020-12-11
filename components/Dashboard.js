@@ -18,6 +18,7 @@ import {
 } from "../state/actions";
 import { useTimer } from "use-timer";
 import AdditionalData from "./AdditionalData";
+import CurrentSpeed from "./CurrentSpeed";
 
 const Dashboard = ({
   dispatch,
@@ -26,6 +27,7 @@ const Dashboard = ({
   currentSpeed,
   distance,
   inMotion,
+  unit,
 }) => {
   const lastPositionRef = useRef(lastPosition);
   const distanceRef = useRef(distance);
@@ -64,11 +66,9 @@ const Dashboard = ({
       Location.watchPositionAsync(
         { accuracy: 6, timeInterval: 1000, distanceInterval: 0 },
         (data) => {
-          console.log("BOOYAHHHH!");
           Location.getCurrentPositionAsync().then((res) => {
             if (res.coords.accuracy < 10) {
               if (lastPositionRef.current) {
-                console.log("SSSSSSSP!");
                 dispatch(
                   setCurrentSpeed(
                     convertSpeed(
@@ -88,13 +88,10 @@ const Dashboard = ({
                     ).toFixed(1)
                   )
                 );
-                console.log(currentSpeedRef);
                 if (currentSpeedRef.current < 1) {
-                  console.log("it's less than 1 meter");
                   dispatch(setInMotion(false));
                 } else {
                   if (!inMotion) {
-                    console.log("We are moving!");
                     dispatch(setInMotion(true));
                   }
                   const distanceTraveled = convertDistance(
@@ -111,7 +108,6 @@ const Dashboard = ({
                     ),
                     "km"
                   );
-                  console.log(distanceTraveled);
 
                   dispatch(setDistance(distanceTraveled + distanceRef.current));
                 }
@@ -124,7 +120,6 @@ const Dashboard = ({
                 }
               }
               dispatch(setLastPosition(data));
-              console.log("we are at the end");
             }
           });
         }
@@ -174,12 +169,7 @@ const Dashboard = ({
           }}
         />
       </View>
-      <View style={{ alignItems: "center" }}>
-        <Text style={{ fontSize: 84 }}>
-          {parseInt(currentSpeed).toFixed(1)}
-        </Text>
-        <Text>km/h</Text>
-      </View>
+      <CurrentSpeed />
       <View
         style={{
           flexDirection: "row",
@@ -213,6 +203,7 @@ const mapStateToProps = (state) => ({
   distance: state.distance,
   inMotion: state.inMotion,
   averageSpeed: state.averageSpeed,
+  unit: state.unit,
 });
 
 export default connect(mapStateToProps)(Dashboard);

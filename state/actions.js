@@ -4,7 +4,13 @@ import {
   SET_CURRENT_SPEED,
   SET_LAST_POSITION,
   SET_IN_MOTION,
+  SET_UNIT,
 } from "./types";
+
+export const setUnit = (payload) => ({
+  type: SET_UNIT,
+  payload,
+});
 
 export const setInMotion = (payload) => ({
   type: SET_IN_MOTION,
