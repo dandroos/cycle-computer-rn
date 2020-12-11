@@ -60,12 +60,11 @@ const Dashboard = ({
         Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.Highest,
-            timeInterval: 3000,
-            distanceInterval: 1,
+            timeInterval: 1000,
           },
           (data) => {
             dispatch(setClock(new Date()));
-            console.log(data.coords.speed);
+            console.log(((data.coords.speed * 3600) / 1000).toFixed(1));
             if (lastPositionRef.current) {
               const _distance = getDistance(
                 {
