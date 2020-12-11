@@ -63,69 +63,62 @@ const Dashboard = ({
       }
 
       setInterval(() => {
-        setCurrentTime(new Date());
         dispatch(setClock(new Date()));
       }, 1000);
 
       Location.watchPositionAsync(
-        { accuracy: 6, timeInterval: 1000, distanceInterval: 0 },
+        { accuracy: 6, timeInterval: 1000, distanceInterval: 2 },
         (data) => {
-          Location.getCurrentPositionAsync().then((res) => {
-            if (res.coords.accuracy < 10) {
-              if (lastPositionRef.current) {
-                dispatch(
-                  setCurrentSpeed(
-                    convertSpeed(
-                      getSpeed(
-                        {
-                          latitude: lastPositionRef.current.coords.latitude,
-                          longitude: lastPositionRef.current.coords.longitude,
-                          time: lastPositionRef.current.timestamp,
-                        },
-                        {
-                          latitude: data.coords.latitude,
-                          longitude: data.coords.longitude,
-                          time: data.timestamp,
-                        }
-                      ),
-                      "kmh"
-                    ).toFixed(1)
-                  )
-                );
-                if (currentSpeedRef.current < 1) {
-                  dispatch(setInMotion(false));
-                } else {
-                  if (!inMotion) {
-                    dispatch(setInMotion(true));
-                  }
-                  const distanceTraveled = convertDistance(
-                    getPreciseDistance(
-                      {
-                        latitude: lastPositionRef.current.coords.latitude,
-                        longitude: lastPositionRef.current.coords.longitude,
-                      },
-                      {
-                        latitude: data.coords.latitude,
-                        longitude: data.coords.longitude,
-                      },
-                      0.1
-                    ),
-                    "km"
-                  );
-
-                  dispatch(setDistance(distanceTraveled + distanceRef.current));
-                }
-                if (typeof distanceRef.current / timeRef.current === "number") {
-                  dispatch(
-                    setAverageSpeed(
-                      (distanceRef.current / timeRef.current) * 3600
-                    )
-                  );
-                }
+          if (lastPositionRef.current) {
+            dispatch(
+              setCurrentSpeed(
+                convertSpeed(
+                  getSpeed(
+                    {
+                      latitude: lastPositionRef.current.coords.latitude,
+                      longitude: lastPositionRef.current.coords.longitude,
+                      time: lastPositionRef.current.timestamp,
+                    },
+                    {
+                      latitude: data.coords.latitude,
+                      longitude: data.coords.longitude,
+                      time: data.timestamp,
+                    }
+                  ),
+                  "kmh"
+                ).toFixed(1)
+              )
+            );
+            if (currentSpeedRef.current > 0) {
+              dispatch(setInMotion(false));
+            } else {
+              if (!inMotion) {
+                dispatch(setInMotion(true));
               }
-              dispatch(setLastPosition(data));
+              const distanceTraveled = convertDistance(
+                getPreciseDistance(
+                  {
+                    latitude: lastPositionRef.current.coords.latitude,
+                    longitude: lastPositionRef.current.coords.longitude,
+                  },
+                  {
+                    latitude: data.coords.latitude,
+                    longitude: data.coords.longitude,
+                  },
+                  0.1
+                ),
+                "km"
+              );
+
+              dispatch(setDistance(distanceTraveled + distanceRef.current));
             }
-          });
+            if (typeof distanceRef.current / timeRef.current === "number") {
+              dispatch(
+                setAverageSpeed((distanceRef.current / timeRef.current) * 3600)
+              );
+            }
+          }
+          dispatch(setLastPosition(data));
         }
       );
     })();
@@ -138,8 +131,6 @@ const Dashboard = ({
       pause();
     }
   }, [inMotion]);
-
-  const [currentTime, setCurrentTime] = useState(new Date());
 
   return (
     <View
