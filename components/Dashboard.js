@@ -123,7 +123,7 @@ const Dashboard = ({
           distanceInterval: 0,
         },
         (data) => {
-          if (data.coords.accuracy < 15) {
+          if (data.coords.accuracy < 10) {
             const distanceTraveled = getDistanceTraveled(data);
             if (distanceTraveled > 1) {
               dispatch(setInMotion(true));
@@ -132,15 +132,7 @@ const Dashboard = ({
               dispatch(setInMotion(false));
             }
             if (positionRef.current) {
-              dispatch(
-                setCurrentSpeed(
-                  calculateSpeed({
-                    lat: data.coords.latitude,
-                    lon: data.coords.longitude,
-                    time: data.timestamp,
-                  })
-                )
-              );
+              dispatch(setCurrentSpeed(data.coords.speed));
             }
             dispatch(setLastPosition(data));
           } else {
