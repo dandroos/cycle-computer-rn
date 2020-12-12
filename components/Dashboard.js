@@ -60,7 +60,7 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
           dispatch(setInMotion(false));
           dispatch(setCurrentSpeed(0));
           setMoving(false);
-        }, 1000)
+        }, 2000)
       );
     }
   }, [moving]);
@@ -98,15 +98,10 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
     inMotion ? start() : pause();
   }, [inMotion]);
 
+  const [visible, setVisible] = useState(true);
+
   return (
     <>
-      <Menu
-        visible={true}
-        onDismiss={() => console.log("dismissed")}
-        anchor={{ x: 0, y: 0 }}
-      >
-        <Menu.Item onPress={() => console.log("pressed")} title="bell" />
-      </Menu>
       <View
         style={{
           flex: 1,
