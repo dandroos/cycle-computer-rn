@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { connect } from "react-redux";
 import { View } from "react-native";
-import { Text, Headline } from "react-native-paper";
 import * as Location from "expo-location";
-import { getDistance, getSpeed, convertSpeed, convertDistance } from "geolib";
+import { getDistance } from "geolib";
 import {
   setCurrentSpeed,
   setLastPosition,
@@ -17,38 +16,53 @@ import { useTimer } from "use-timer";
 import AdditionalData from "./AdditionalData";
 import CurrentSpeed from "./CurrentSpeed";
 
-const Dashboard = ({
-  dispatch,
-  averageSpeed,
-  lastPosition,
-  currentSpeed,
-  distance,
-  inMotion,
-  unit,
-}) => {
-  const lastPositionRef = useRef(lastPosition);
-  const distanceRef = useRef(distance);
-  const currentSpeedRef = useRef(currentSpeed);
-
+const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
   const { time, pause, start, reset } = useTimer();
-  const timeRef = useRef(time);
 
   useEffect(() => {
-    timeRef.current = time;
     dispatch(setTimeInMotion(time));
+
+    // recalculate average speed
+    if (typeof distance / time === "number") {
+      dispatch(setAverageSpeed(((distance / time) * 3600) / 1000));
+    }
   }, [time]);
 
-  useEffect(() => {
-    lastPositionRef.current = lastPosition;
-  }, [lastPosition]);
+  const [moving, setMoving] = useState(false);
+  const [timer, setTimer] = useState(null);
+
+  const updateDistance = (newPosition) => {
+    if (lastPosition) {
+      const distanceCovered = getDistance(
+        {
+          latitude: lastPosition.coords.latitude,
+          longitude: lastPosition.coords.longitude,
+        },
+        {
+          latitude: newPosition.coords.latitude,
+          longitude: newPosition.coords.longitude,
+        },
+        0.1
+      );
+      dispatch(setDistance(distance + distanceCovered));
+    }
+  };
 
   useEffect(() => {
-    distanceRef.current = distance;
-  }, [distance]);
-
-  useEffect(() => {
-    currentSpeedRef.current = currentSpeed;
-  }, [currentSpeed]);
+    if (moving) {
+      if (timer) {
+        dispatch(setInMotion(true));
+        clearTimeout(timer);
+      }
+      setTimer(
+        setTimeout(() => {
+          dispatch(setInMotion(false));
+          dispatch(setCurrentSpeed(0));
+          setMoving(false);
+        }, 2000)
+      );
+    }
+  }, [moving]);
 
   useEffect(() => {
     (async () => {
@@ -61,114 +75,26 @@ const Dashboard = ({
           {
             accuracy: Location.Accuracy.Highest,
             timeInterval: 1000,
-            distanceInterval: 0,
+            distanceInterval: 3,
           },
           (data) => {
-            dispatch(setClock(new Date()));
-            console.log(((data.coords.speed * 3600) / 1000).toFixed(1) < 1);
-            if (lastPositionRef.current) {
-              const _distance = getDistance(
-                {
-                  latitude: lastPositionRef.current.coords.latitude,
-                  longitude: lastPositionRef.current.coords.longitude,
-                },
-                {
-                  latitude: data.coords.latitude,
-                  longitude: data.coords.longitude,
-                },
-                0.1
+            if (data.coords.accuracy < 15) {
+              setMoving(true);
+              dispatch(setClock(new Date()));
+              dispatch(
+                setCurrentSpeed(((data.coords.speed * 3600) / 1000).toFixed(1))
               );
-              // console.log(_distance);
-              console.log(_distance > 0 ? "We are moving" : "We are stopped");
+              updateDistance(data);
+              dispatch(setLastPosition(data));
             }
-            dispatch(setLastPosition(data));
           }
         );
       });
-
-      /*
-      Location.watchPositionAsync(
-        { accuracy: 6, distanceInterval: 1 },
-        (data) => {
-          console.log(`Acc: ${data.coords.accuracy}`);
-          if (data.coords.accuracy < 5) console.log(data.coords.speed * 3600);
-          if (lastPositionRef.current) {
-            const _distance = getDistance(
-              {
-                latitude: lastPositionRef.current.coords.latitude,
-                longitude: lastPositionRef.current.coords.longitude,
-              },
-              {
-                latitude: data.coords.latitude,
-                longitude: data.coords.longitude,
-              },
-              0.5
-            );
-            console.log(_distance);
-
-            console.log(_distance > 0);
-
-            /*
-            dispatch(
-              setCurrentSpeed(
-                convertSpeed(
-                  getSpeed(
-                    {
-                      latitude: lastPositionRef.current.coords.latitude,
-                      longitude: lastPositionRef.current.coords.longitude,
-                      time: lastPositionRef.current.timestamp,
-                    },
-                    {
-                      latitude: data.coords.latitude,
-                      longitude: data.coords.longitude,
-                      time: data.timestamp,
-                    }
-                  ),
-                  "kmh"
-                ).toFixed(1)
-              )
-            );
-            if (currentSpeedRef.current > 0) {
-              dispatch(setInMotion(false));
-            } else {
-              if (!inMotion) {
-                dispatch(setInMotion(true));
-              }
-              const distanceTraveled = convertDistance(
-                getDistance(
-                  {
-                    latitude: lastPositionRef.current.coords.latitude,
-                    longitude: lastPositionRef.current.coords.longitude,
-                  },
-                  {
-                    latitude: data.coords.latitude,
-                    longitude: data.coords.longitude,
-                  },
-                  0.1
-                ),
-                "km"
-              );
-
-              dispatch(setDistance(distanceTraveled + distanceRef.current));
-            }
-            if (typeof distanceRef.current / timeRef.current === "number") {
-              dispatch(
-                setAverageSpeed((distanceRef.current / timeRef.current) * 3600)
-              );
-            }
-          }
-      dispatch(setLastPosition(data)); 
-        }
-      );*/
     })();
   }, []);
 
   useEffect(() => {
-    if (inMotion) {
-      start();
-    } else {
-      pause();
-    }
+    inMotion ? start() : pause();
   }, [inMotion]);
 
   return (
@@ -205,10 +131,8 @@ const Dashboard = ({
 };
 const mapStateToProps = (state) => ({
   lastPosition: state.lastPosition,
-  currentSpeed: state.currentSpeed,
   distance: state.distance,
   inMotion: state.inMotion,
-  averageSpeed: state.averageSpeed,
   unit: state.unit,
 });
 
