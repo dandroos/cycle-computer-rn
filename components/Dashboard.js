@@ -49,9 +49,6 @@ const Dashboard = ({
     // recalculate average speed
   }, [time]);
 
-  const [moving, setMoving] = useState(false);
-  const [timer, setTimer] = useState(null);
-
   const positionRef = useRef(lastPosition);
 
   useEffect(() => {
@@ -97,7 +94,7 @@ const Dashboard = ({
         (data) => {
           if (data.coords.accuracy < 10) {
             const distanceTraveled = getDistanceTraveled(data);
-            if (distanceTraveled > 2) {
+            if (distanceTraveled > 1) {
               dispatch(setInMotion(true));
               updateDistance(distanceTraveled);
               dispatch(setCurrentSpeed(data.coords.speed));
@@ -108,7 +105,7 @@ const Dashboard = ({
             }
             dispatch(setLastPosition(data));
           } else {
-            setInMotion(false);
+            dispatch(setInMotion(false));
           }
           dispatch(setClock(new Date()));
         }
@@ -117,7 +114,12 @@ const Dashboard = ({
   }, []);
 
   useEffect(() => {
-    inMotion ? start() : pause();
+    if (inMotion) {
+      start();
+    } else {
+      pause();
+      dispatch(setCurrentSpeed(0));
+    }
   }, [inMotion]);
 
   return (
