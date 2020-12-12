@@ -22,7 +22,11 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
 
   useEffect(() => {
     dispatch(setTimeInMotion(time));
-
+    if (distance > 0) {
+      console.log(typeof distance / time);
+      console.log(typeof parseFloat(distance));
+      console.log(typeof time);
+    }
     // recalculate average speed
     if (typeof distance / time === "number") {
       dispatch(setAverageSpeed(((distance / time) * 3600) / 1000));
@@ -60,7 +64,7 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
   }, [distance]);
   const updateDistance = (d) => {
     console.log(d);
-    dispatch(setDistance(parseFloat(distanceRef.current + d / 1000)));
+    dispatch(setDistance(parseFloat(distanceRef.current + d)));
   };
 
   useEffect(() => {
@@ -84,8 +88,7 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
         longitude: positionRef.current.coords.longitude,
         time: positionRef.current.timestamp,
       },
-      { latitude: lat, longitude: lon, time: time },
-      "kmh"
+      { latitude: lat, longitude: lon, time: time }
     );
   };
 
@@ -118,7 +121,7 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
                     lon: data.coords.longitude,
                     time: data.timestamp,
                   })
-                ).toFixed(1)
+                )
               );
             }
             dispatch(setLastPosition(data));

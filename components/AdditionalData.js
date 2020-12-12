@@ -18,7 +18,9 @@ const AdditionalData = ({
     DISTANCE: {
       label: "Distance",
       reading:
-        appUnit === "k" ? distance.toFixed(2) : (distance / 1.609).toFixed(2),
+        appUnit === "k"
+          ? (distance / 1000).toFixed(2)
+          : (distance / 1000 / 1.609).toFixed(2),
       unit: appUnit === "k" ? "km" : "mi",
     },
     AVERAGE_SPEED: {

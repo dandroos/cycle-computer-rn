@@ -11,7 +11,7 @@ import {
 } from "./types";
 
 const initialState = {
-  distance: 0.0,
+  distance: 200.0,
   averageSpeed: 0.0,
   currentSpeed: 0.0,
   lastPosition: null,
@@ -23,7 +23,7 @@ const initialState = {
     slot3: "TIME_IN_MOTION",
     slot4: "CLOCK",
   },
-  timeInMotion: new Date(),
+  timeInMotion: 23,
   clock: new Date(),
 };
 
