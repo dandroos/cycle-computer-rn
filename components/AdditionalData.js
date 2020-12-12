@@ -25,7 +25,7 @@ const AdditionalData = ({
     },
     AVERAGE_SPEED: {
       label: "Average speed",
-      reading: averageSpeed.toFixed(1),
+      reading: parseFloat(averageSpeed).toFixed(1),
       unit: appUnit === "k" ? "km/h" : "mph",
     },
     TIME_IN_MOTION: {

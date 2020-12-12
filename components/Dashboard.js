@@ -17,19 +17,37 @@ import { useTimer } from "use-timer";
 import AdditionalData from "./AdditionalData";
 import CurrentSpeed from "./CurrentSpeed";
 
-const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
+const Dashboard = ({
+  dispatch,
+  lastPosition,
+  distance,
+  inMotion,
+  unit,
+  timeInMotion,
+}) => {
   const { time, pause, start, reset } = useTimer();
 
   useEffect(() => {
     dispatch(setTimeInMotion(time));
     if (distance > 0) {
-      console.log(typeof distance / time);
+      console.log(parseFloat(distance / timeInMotion));
       console.log(typeof parseFloat(distance));
       console.log(typeof time);
     }
     // recalculate average speed
-    if (typeof distance / time === "number") {
-      dispatch(setAverageSpeed(((distance / time) * 3600) / 1000));
+    if (typeof parseFloat(distance / timeInMotion) === "number" && time > 0) {
+      if (unit === "k") {
+        dispatch(
+          setAverageSpeed(parseFloat(((distance / timeInMotion) * 3600) / 1000))
+        );
+      } else {
+        console.log("hellooooooo");
+        dispatch(
+          setAverageSpeed(
+            parseFloat(((distance / 1.609 / timeInMotion) * 3600) / 1000)
+          )
+        );
+      }
     }
   }, [time]);
 
@@ -177,6 +195,7 @@ const mapStateToProps = (state) => ({
   distance: state.distance,
   inMotion: state.inMotion,
   unit: state.unit,
+  timeInMotion: state.timeInMotion,
 });
 
 export default connect(mapStateToProps)(Dashboard);
