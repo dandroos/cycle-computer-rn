@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { View } from "react-native";
 import { Menu } from "react-native-paper";
 import * as Location from "expo-location";
-import { getDistance, getSpeed } from "geolib";
+import { getDistance, getSpeed, getPreciseDistance } from "geolib";
 import {
   setCurrentSpeed,
   setLastPosition,
@@ -29,26 +29,24 @@ const Dashboard = ({
 
   useEffect(() => {
     dispatch(setTimeInMotion(time));
-    if (distance > 0) {
-      console.log(parseFloat(distance / timeInMotion));
-      console.log(typeof parseFloat(distance));
-      console.log(typeof time);
-    }
-    // recalculate average speed
-    if (typeof parseFloat(distance / timeInMotion) === "number" && time > 0) {
-      if (unit === "k") {
-        dispatch(
-          setAverageSpeed(parseFloat(((distance / timeInMotion) * 3600) / 1000))
-        );
-      } else {
-        console.log("hellooooooo");
-        dispatch(
-          setAverageSpeed(
-            parseFloat(((distance / 1.609 / timeInMotion) * 3600) / 1000)
-          )
-        );
+    if (distance > 0 && timeInMotion > 0) {
+      if (typeof parseFloat(distance / timeInMotion) === "number" && time > 0) {
+        if (unit === "k") {
+          dispatch(
+            setAverageSpeed(
+              parseFloat(((distance / timeInMotion) * 3600) / 1000)
+            )
+          );
+        } else {
+          dispatch(
+            setAverageSpeed(
+              parseFloat(((distance / 1.609 / timeInMotion) * 3600) / 1000)
+            )
+          );
+        }
       }
     }
+    // recalculate average speed
   }, [time]);
 
   const [moving, setMoving] = useState(false);
@@ -62,7 +60,7 @@ const Dashboard = ({
 
   const getDistanceTraveled = (newPosition) => {
     if (positionRef.current) {
-      return getDistance(
+      return getPreciseDistance(
         {
           latitude: positionRef.current.coords.latitude,
           longitude: positionRef.current.coords.longitude,
@@ -81,33 +79,7 @@ const Dashboard = ({
     distanceRef.current = distance;
   }, [distance]);
   const updateDistance = (d) => {
-    console.log(d);
     dispatch(setDistance(parseFloat(distanceRef.current + d)));
-  };
-
-  useEffect(() => {
-    if (moving) {
-      if (timer) {
-        dispatch(setInMotion(true));
-        clearTimeout(timer);
-      }
-      setTimer(
-        setTimeout(() => {
-          setMoving(false);
-        }, 2000)
-      );
-    }
-  }, [moving]);
-
-  const calculateSpeed = ({ lat, lon, time }) => {
-    return getSpeed(
-      {
-        latitude: positionRef.current.coords.latitude,
-        longitude: positionRef.current.coords.longitude,
-        time: positionRef.current.timestamp,
-      },
-      { latitude: lat, longitude: lon, time: time }
-    );
   };
 
   useEffect(() => {
@@ -119,20 +91,20 @@ const Dashboard = ({
       Location.watchPositionAsync(
         {
           accuracy: Location.Accuracy.BestForNavigation,
-          timeInterval: 1000,
+          timeInterval: 2000,
           distanceInterval: 0,
         },
         (data) => {
           if (data.coords.accuracy < 10) {
             const distanceTraveled = getDistanceTraveled(data);
-            if (distanceTraveled > 1) {
+            if (distanceTraveled > 2) {
               dispatch(setInMotion(true));
               updateDistance(distanceTraveled);
+              dispatch(setCurrentSpeed(data.coords.speed));
             } else {
               dispatch(setInMotion(false));
             }
             if (positionRef.current) {
-              dispatch(setCurrentSpeed(data.coords.speed));
             }
             dispatch(setLastPosition(data));
           } else {
@@ -152,6 +124,7 @@ const Dashboard = ({
     <>
       <View
         style={{
+          backgroundColor: inMotion ? "green" : "red",
           flex: 1,
           flexDirection: "column",
           justifyContent: "space-around",

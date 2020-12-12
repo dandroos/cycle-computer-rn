@@ -8,8 +8,8 @@ const CurrentSpeed = ({ currentSpeed, unit }) => {
     <View style={{ alignItems: "center" }}>
       <Text style={{ fontSize: 84 }}>
         {unit === "k"
-          ? parseFloat(currentSpeed / 1000).toFixed(1)
-          : parseFloat(currentSpeed / 1000 / 1.609).toFixed(1)}
+          ? parseFloat((currentSpeed * 3600) / 1000).toFixed(1)
+          : parseFloat((currentSpeed * 3600) / 1000 / 1.609).toFixed(1)}
       </Text>
       <Text>{unit === "k" ? "km/h" : "mph"}</Text>
     </View>
