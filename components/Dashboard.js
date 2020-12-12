@@ -37,6 +37,7 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
   useEffect(() => {
     positionRef.current = lastPosition;
   }, [lastPosition]);
+
   const getDistanceTraveled = (newPosition) => {
     if (positionRef.current) {
       return getDistance(
@@ -53,7 +54,13 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
     }
   };
 
-  const updateDistance = (newPosition) => {};
+  const distanceRef = useRef(distance);
+  useEffect(() => {
+    distanceRef.current = distance;
+  }, [distance]);
+  const updateDistance = (d) => {
+    dispatch(setDistance(parseFloat(distance.current + d)));
+  };
 
   useEffect(() => {
     if (moving) {
@@ -85,6 +92,7 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
           const distanceTraveled = getDistanceTraveled(data);
           if (distanceTraveled > 1) {
             dispatch(setInMotion(true));
+            updateDistance(distanceTraveled);
           } else {
             dispatch(setInMotion(false));
           }
@@ -92,7 +100,6 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
             setCurrentSpeed(((data.coords.speed * 3600) / 1000).toFixed(1))
           );
           dispatch(setClock(new Date()));
-          updateDistance(data);
           dispatch(setLastPosition(data));
         }
       );
