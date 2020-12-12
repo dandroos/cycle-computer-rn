@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { View } from "react-native";
+import { Menu } from "react-native-paper";
 import * as Location from "expo-location";
 import { getDistance } from "geolib";
 import {
@@ -98,35 +99,44 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
   }, [inMotion]);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        flexDirection: "column",
-        justifyContent: "space-around",
-      }}
-    >
+    <>
+      <Menu
+        visible={true}
+        onDismiss={() => console.log("dismissed")}
+        anchor={{ x: 0, y: 0 }}
+      >
+        <Menu.Item onPress={() => console.log("pressed")} title="bell" />
+      </Menu>
       <View
         style={{
-          flexDirection: "row",
+          flex: 1,
+          flexDirection: "column",
           justifyContent: "space-around",
-          alignItems: "center",
         }}
       >
-        <AdditionalData slotNumber={1} />
-        <AdditionalData slotNumber={2} />
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            alignItems: "center",
+          }}
+        >
+          <AdditionalData slotNumber={1} />
+          <AdditionalData slotNumber={2} />
+        </View>
+        <CurrentSpeed />
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            alignItems: "center",
+          }}
+        >
+          <AdditionalData slotNumber={3} />
+          <AdditionalData slotNumber={4} />
+        </View>
       </View>
-      <CurrentSpeed />
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          alignItems: "center",
-        }}
-      >
-        <AdditionalData slotNumber={3} />
-        <AdditionalData slotNumber={4} />
-      </View>
-    </View>
+    </>
   );
 };
 const mapStateToProps = (state) => ({

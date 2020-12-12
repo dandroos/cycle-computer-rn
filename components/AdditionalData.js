@@ -36,23 +36,18 @@ const AdditionalData = ({
   };
 
   return (
-    <>
-      <TouchableOpacity onLongPress={() => console.log("load a menu")}>
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ fontSize: 15 }}>
-            {}
-            {dashboardData[slots[`slot${slotNumber}`]].label}
-          </Text>
-          <Text style={{ fontSize: 34 }}>
-            {dashboardData[slots[`slot${slotNumber}`]].reading}
-          </Text>
-          <Text>{dashboardData[slots[`slot${slotNumber}`]].unit}</Text>
-        </View>
-      </TouchableOpacity>
-      <Menu visible={true}>
-        <Menu.Item title="Cock" />
-      </Menu>
-    </>
+    <TouchableOpacity onLongPress={() => console.log("load a menu")}>
+      <View style={{ alignItems: "center" }}>
+        <Text style={{ fontSize: 15 }}>
+          {}
+          {dashboardData[slots[`slot${slotNumber}`]].label}
+        </Text>
+        <Text style={{ fontSize: 34 }}>
+          {dashboardData[slots[`slot${slotNumber}`]].reading}
+        </Text>
+        <Text>{dashboardData[slots[`slot${slotNumber}`]].unit}</Text>
+      </View>
+    </TouchableOpacity>
   );
 };
 
