@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { View } from "react-native";
 import * as Location from "expo-location";
@@ -59,7 +59,7 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
           dispatch(setInMotion(false));
           dispatch(setCurrentSpeed(0));
           setMoving(false);
-        }, 2000)
+        }, 1000)
       );
     }
   }, [moving]);
@@ -74,8 +74,8 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
         Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.Highest,
-            timeInterval: 1000,
-            distanceInterval: 3,
+            timeInterval: 1500,
+            distanceInterval: 1.2,
           },
           (data) => {
             if (data.coords.accuracy < 15) {
