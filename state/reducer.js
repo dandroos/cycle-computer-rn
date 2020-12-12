@@ -16,7 +16,7 @@ const initialState = {
   currentSpeed: 0.0,
   lastPosition: null,
   inMotion: false,
-  unit: "k",
+  unit: "m",
   slots: {
     slot1: "DISTANCE",
     slot2: "AVERAGE_SPEED",

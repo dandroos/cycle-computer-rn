@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { View } from "react-native";
 import { Menu } from "react-native-paper";
 import * as Location from "expo-location";
-import { getDistance } from "geolib";
+import { getDistance, getSpeed } from "geolib";
 import {
   setCurrentSpeed,
   setLastPosition,
@@ -59,7 +59,8 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
     distanceRef.current = distance;
   }, [distance]);
   const updateDistance = (d) => {
-    dispatch(setDistance(parseFloat(distance.current + d)));
+    console.log(d);
+    dispatch(setDistance(parseFloat(distanceRef.current + d / 1000)));
   };
 
   useEffect(() => {
@@ -76,6 +77,18 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
     }
   }, [moving]);
 
+  const calculateSpeed = ({ lat, lon, time }) => {
+    return getSpeed(
+      {
+        latitude: positionRef.current.coords.latitude,
+        longitude: positionRef.current.coords.longitude,
+        time: positionRef.current.timestamp,
+      },
+      { latitude: lat, longitude: lon, time: time },
+      "kmh"
+    );
+  };
+
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestPermissionsAsync();
@@ -89,18 +102,30 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
           distanceInterval: 0,
         },
         (data) => {
-          const distanceTraveled = getDistanceTraveled(data);
-          if (distanceTraveled > 1) {
-            dispatch(setInMotion(true));
-            updateDistance(distanceTraveled);
+          if (data.coords.accuracy < 15) {
+            const distanceTraveled = getDistanceTraveled(data);
+            if (distanceTraveled > 1) {
+              dispatch(setInMotion(true));
+              updateDistance(distanceTraveled);
+            } else {
+              dispatch(setInMotion(false));
+            }
+            if (positionRef.current) {
+              dispatch(
+                setCurrentSpeed(
+                  calculateSpeed({
+                    lat: data.coords.latitude,
+                    lon: data.coords.longitude,
+                    time: data.timestamp,
+                  })
+                ).toFixed(1)
+              );
+            }
+            dispatch(setLastPosition(data));
           } else {
-            dispatch(setInMotion(false));
+            setInMotion(false);
           }
-          dispatch(
-            setCurrentSpeed(((data.coords.speed * 3600) / 1000).toFixed(1))
-          );
           dispatch(setClock(new Date()));
-          dispatch(setLastPosition(data));
         }
       );
     })();

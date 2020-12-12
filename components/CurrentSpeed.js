@@ -6,7 +6,11 @@ import { Text } from "react-native-paper";
 const CurrentSpeed = ({ currentSpeed, unit }) => {
   return (
     <View style={{ alignItems: "center" }}>
-      <Text style={{ fontSize: 84 }}>{parseInt(currentSpeed).toFixed(1)}</Text>
+      <Text style={{ fontSize: 84 }}>
+        {unit === "k"
+          ? parseFloat(currentSpeed).toFixed(1)
+          : parseFloat(currentSpeed / 1.609).toFixed(1)}
+      </Text>
       <Text>{unit === "k" ? "km/h" : "mph"}</Text>
     </View>
   );

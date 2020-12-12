@@ -17,7 +17,8 @@ const AdditionalData = ({
   const dashboardData = {
     DISTANCE: {
       label: "Distance",
-      reading: distance.toFixed(2),
+      reading:
+        appUnit === "k" ? distance.toFixed(2) : (distance / 1.609).toFixed(2),
       unit: appUnit === "k" ? "km" : "mi",
     },
     AVERAGE_SPEED: {
