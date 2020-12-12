@@ -32,9 +32,9 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
   const [moving, setMoving] = useState(false);
   const [timer, setTimer] = useState(null);
 
-  const updateDistance = (newPosition) => {
+  const getDistanceTraveled = (newPosition) => {
     if (lastPosition) {
-      const distanceCovered = getDistance(
+      return getDistance(
         {
           latitude: lastPosition.coords.latitude,
           longitude: lastPosition.coords.longitude,
@@ -45,9 +45,10 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
         },
         0.1
       );
-      dispatch(setDistance(distance + distanceCovered));
     }
   };
+
+  const updateDistance = (newPosition) => {};
 
   useEffect(() => {
     if (moving) {
@@ -75,19 +76,18 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
         Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.Highest,
-            timeInterval: 1500,
-            distanceInterval: 1.2,
+            timeInterval: 1000,
+            distanceInterval: 0,
           },
           (data) => {
-            if (data.coords.accuracy < 15) {
-              setMoving(true);
-              dispatch(setClock(new Date()));
-              dispatch(
-                setCurrentSpeed(((data.coords.speed * 3600) / 1000).toFixed(1))
-              );
-              updateDistance(data);
-              dispatch(setLastPosition(data));
-            }
+            console.log(getDistanceTraveled(data));
+            setMoving(true);
+            dispatch(setClock(new Date()));
+            dispatch(
+              setCurrentSpeed(((data.coords.speed * 3600) / 1000).toFixed(1))
+            );
+            updateDistance(data);
+            dispatch(setLastPosition(data));
           }
         );
       });
@@ -97,8 +97,6 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
   useEffect(() => {
     inMotion ? start() : pause();
   }, [inMotion]);
-
-  const [visible, setVisible] = useState(true);
 
   return (
     <>

@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { connect } from "react-redux";
 import { View, TouchableOpacity } from "react-native";
 import { Menu, Text } from "react-native-paper";
+import { setSlots } from "../state/actions";
 
 const AdditionalData = ({
+  dispatch,
   slots,
   distance,
   averageSpeed,
@@ -37,6 +39,16 @@ const AdditionalData = ({
 
   const [visible, setVisible] = useState(false);
 
+  const handleChange = (r) => {
+    dispatch(
+      setSlots({
+        ...slots,
+        [`slot${slotNumber}`]: r,
+      })
+    );
+    setVisible(false);
+  };
+
   return (
     <Menu
       anchor={
@@ -56,7 +68,16 @@ const AdditionalData = ({
       visible={visible}
       onDismiss={() => setVisible(false)}
     >
-      <Menu.Item title="COCK" />
+      <Menu.Item title="Distance" onPress={() => handleChange("DISTANCE")} />
+      <Menu.Item
+        title="Average speed"
+        onPress={() => handleChange("AVERAGE_SPEED")}
+      />
+      <Menu.Item
+        title="Time in motion"
+        onPress={() => handleChange("TIME_IN_MOTION")}
+      />
+      <Menu.Item title="Clock" onPress={() => handleChange("CLOCK")} />
     </Menu>
   );
 };
