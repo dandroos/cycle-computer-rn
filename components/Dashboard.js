@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { View } from "react-native";
 import { Menu } from "react-native-paper";
@@ -32,12 +32,17 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
   const [moving, setMoving] = useState(false);
   const [timer, setTimer] = useState(null);
 
+  const positionRef = useRef(lastPosition);
+
+  useEffect(() => {
+    positionRef.current = lastPosition;
+  }, [lastPosition]);
   const getDistanceTraveled = (newPosition) => {
-    if (lastPosition) {
+    if (positionRef.current) {
       return getDistance(
         {
-          latitude: lastPosition.coords.latitude,
-          longitude: lastPosition.coords.longitude,
+          latitude: positionRef.current.coords.latitude,
+          longitude: positionRef.current.coords.longitude,
         },
         {
           latitude: newPosition.coords.latitude,
@@ -58,8 +63,6 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
       }
       setTimer(
         setTimeout(() => {
-          dispatch(setInMotion(false));
-          dispatch(setCurrentSpeed(0));
           setMoving(false);
         }, 2000)
       );
@@ -72,25 +75,27 @@ const Dashboard = ({ dispatch, lastPosition, distance, inMotion, unit }) => {
       if (status !== "granted") {
         // handle error
       }
-      Location.enableNetworkProviderAsync().then(() => {
-        Location.watchPositionAsync(
-          {
-            accuracy: Location.Accuracy.Highest,
-            timeInterval: 1000,
-            distanceInterval: 0,
-          },
-          (data) => {
-            console.log(getDistanceTraveled(data));
-            setMoving(true);
-            dispatch(setClock(new Date()));
-            dispatch(
-              setCurrentSpeed(((data.coords.speed * 3600) / 1000).toFixed(1))
-            );
-            updateDistance(data);
-            dispatch(setLastPosition(data));
+      Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.BestForNavigation,
+          timeInterval: 1000,
+          distanceInterval: 0,
+        },
+        (data) => {
+          const distanceTraveled = getDistanceTraveled(data);
+          if (distanceTraveled > 1) {
+            dispatch(setInMotion(true));
+          } else {
+            dispatch(setInMotion(false));
           }
-        );
-      });
+          dispatch(
+            setCurrentSpeed(((data.coords.speed * 3600) / 1000).toFixed(1))
+          );
+          dispatch(setClock(new Date()));
+          updateDistance(data);
+          dispatch(setLastPosition(data));
+        }
+      );
     })();
   }, []);
 
